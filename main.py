@@ -161,4 +161,6 @@ def test_routing5():
 
 
 if __name__ == '__main__':
-    pass
+    test_routing5()
+    test_reach_limit()
+    
