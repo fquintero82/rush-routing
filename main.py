@@ -117,38 +117,6 @@ def routing5(current_state,inflow,velocity,channel_length,sparse_upstream,DT=360
 
     return(outflow,current_state)
 
-def test_reach_limit():
-    # Example network
-    n = 8
-    length = np.array([500, 600, 400, 1000, 700, 900, 800, 1200], dtype=np.float32)
-    downstream = np.array([1, 2, 3, 4, 5, 6, 7, -1], dtype=np.int32)
-
-    velocity = 0.3   # m/s
-    dt = 3600.0
-    Dmax = np.float32(velocity * dt)
-
-    # Allocate GPU arrays
-    d_length = cuda.to_device(length)
-    d_downstream = cuda.to_device(downstream)
-    d_reach_limit = cuda.device_array(n, dtype=np.int32)
-    d_distance_accum = cuda.device_array(n, dtype=np.float32)
-
-    # Launch kernel
-    threads_per_block = 128
-    blocks = (n + threads_per_block - 1) // threads_per_block
-
-    reach_limit_kernel[blocks, threads_per_block](
-        d_downstream, d_length, Dmax, d_reach_limit, d_distance_accum
-    )
-
-    # Copy results back
-    reach_limit = d_reach_limit.copy_to_host()
-    distance_accum = d_distance_accum.copy_to_host()
-
-    print(f"Dmax = {Dmax:.1f} m")
-    print("Reach limit IDs:", reach_limit)
-    print("Accumulated distance:", distance_accum)
-
 
 
 if __name__ == '__main__':
